@@ -1,0 +1,53 @@
+{
+  "Services": {
+    "logstash": {
+      "Args": [
+        "--verbose", 
+        "--debug", 
+        "-f", 
+        "/logstash.conf"
+      ], 
+      "Image": "logstash@sha256:c32ed5dac5ab4bab4f8d3cc4e0460a07967b74b5e04bfaa86a098b9ba2938bbd", 
+      "Networks": [
+        "default"
+      ]
+    }, 
+    "producer": {
+      "Command": [
+        "/bin/sh", 
+        "/produce.sh"
+      ], 
+      "Image": "appropriate/curl@sha256:d6f941034fc1cdd4d3405589079b8f26f2c28661c3b405363b320d9f020c2578", 
+      "Networks": [
+        "default"
+      ]
+    }, 
+    "proxy": {
+      "Args": [
+        "-f", 
+        "/haproxy.conf"
+      ], 
+      "Image": "haproxy@sha256:0a7f4aa2aec9e6735f125c8ae71327a3da3fcc8fbab548c9eb82e7ba2cb00245", 
+      "Networks": [
+        "default"
+      ], 
+      "Ports": [
+        {
+          "Port": 80, 
+          "Protocol": "tcp"
+        }, 
+        {
+          "Port": 5672, 
+          "Protocol": "tcp"
+        }
+      ]
+    }, 
+    "rabbit": {
+      "Image": "rabbitmq@sha256:520fd5bb58104e82d2f8d4215cc84c64e72e62697abcba30f9d16f5c1a16f5ac", 
+      "Networks": [
+        "default"
+      ]
+    }
+  }, 
+  "Version": "0.1"
+}

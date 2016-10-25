@@ -1,0 +1,43 @@
+version: '2'
+
+services:
+    rabbit:
+        image: rabbitmq:management
+        ports: 
+            - 55672:15672
+
+    producer:
+        image: appropriate/curl:latest
+        depends_on:
+            - rabbit
+        links:
+            - rabbit
+        volumes: 
+            - ./produce.sh:/produce.sh
+        entrypoint: /bin/sh
+        command: ["/produce.sh"]
+
+    proxy:
+        image: rafpe/docker-haproxy-rsyslog #haproxy with logging
+        depends_on:
+            - rabbit
+        expose:
+            - "80"
+            - "5672"
+        links:
+            - rabbit
+        volumes: 
+            - ./haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg
+        ports: 
+            - 50000:80
+        
+    logstash:
+        image: logstash:latest
+        links:
+            - proxy
+            - rabbit
+        depends_on:
+            - proxy
+        volumes: 
+            - ./logstash.conf:/logstash.conf
+        command: ["--verbose", "--debug", "-f" ,"/logstash.conf"]
