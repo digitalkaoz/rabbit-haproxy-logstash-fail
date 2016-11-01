@@ -32,7 +32,7 @@ services:
             - 50000:80
         
     logstash:
-        image: logstash:latest
+        build: ./logstash
         links:
             - proxy
             - rabbit
@@ -40,4 +40,4 @@ services:
             - proxy
         volumes: 
             - ./logstash.conf:/logstash.conf
-        command: ["--verbose", "--debug", "-f" ,"/logstash.conf"]
+        command: ["--verbose", "--debug", "-f" ,"/logstash.conf", "-r"]
